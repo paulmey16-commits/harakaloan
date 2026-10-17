@@ -533,14 +533,24 @@
       clearInterval(hintTimer);
 
       if (ref) {
+        /* record the computed offer locally so the receipt page always has data,
+           even if the server restarts (Render free tier resets its file disk) */
+        const amount = Number(data.amount);
+        const fee = Math.round(amount * 0.05);
+        const daysMap = { "1": 30, "2": 60, "4": 120, "6": 180, "8": 240, "12": 365, "24": 730 };
+        const due = new Date(Date.now() + (daysMap[data.duration] || 30) * 86400000)
+          .toISOString().slice(0, 10);
         localStorage.setItem("haraka_application", JSON.stringify({
           fullName: data.fullName,
           phone: data.phone,
           region: data.region,
-          amount: data.amount,
+          amount: amount,
           purpose: data.purpose,
-          status: "approved",
-          reference: ref
+          status: "pending",
+          reference: ref,
+          fee: fee,
+          total: amount + fee,
+          dueDate: due
         }));
         document.getElementById("overlayHint").textContent = "Inaendelea…";
         setTimeout(() => {
