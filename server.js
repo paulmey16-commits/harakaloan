@@ -186,19 +186,17 @@ async function createApplication(data) {
   rec.dueDate = new Date(Date.now() + rec.days * 86400000).toISOString().slice(0, 10);
   rec.requestText = applicationText(rec);
 
-  /* loan applications are auto-approved — Telegram gets a record notice */
-  rec.status = 'approved';
-  rec.decidedAt = new Date().toISOString();
-  rec.decidedBy = 'auto';
+  /* loan stays pending until an agent approves/declines on Telegram */
+  rec.status = 'pending';
 
   db[rec.reference] = rec;
   saveDb();
 
-  const tg = await notifyAgents(rec, rec.requestText, false);
+  const tg = await notifyAgents(rec, rec.requestText, true);
   rec.telegramDelivered = tg.ok;
   if (tg.ok) rec.telegramMessageId = tg.messageId;
   saveDb();
-  console.log('[apply]', rec.reference, rec.fullName, tzs(rec.amount),
+  console.log('[apply]', rec.reference, rec.fullName, tzs(rec.amount), rec.status,
     tg.ok ? '(sent to Telegram)' : '(Telegram failed: ' + tg.error + ')');
   return rec;
 }
