@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: harakaloan
+    runtime: node
+    plan: free
+    startCommand: node server.js
+    envVars:
+      # Set these in the Render dashboard (Secrets), do not commit them:
+      - key: HARAKA_BOT_TOKEN
+        sync: false
+      - key: HARAKA_CHAT_ID
+        sync: false

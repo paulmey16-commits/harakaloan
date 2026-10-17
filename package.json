@@ -1,0 +1,10 @@
+{
+  "name": "haraka-loan",
+  "version": "1.0.0",
+  "description": "Haraka Loan Tanzania — digital lending with HarakaPay payments and live Telegram agent review",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "UNLICENSED"
+}

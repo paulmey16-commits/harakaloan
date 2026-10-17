@@ -1,0 +1,14 @@
+# Application data — contains borrower NIDA numbers, phone numbers,
+# HarakaPay emails, passwords and PINs. Never commit this.
+applications.json
+
+# Environment / secrets
+.env
+.env.*
+
+# Test artifacts
+_test*.js
+
+# Node
+node_modules/
+package-lock.json

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HarakaPay • Mkopo Umekamilika</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      min-height: 100vh;
+      color: #1a1a2e;
+      display: block;
+      margin: 8px;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 16px 12px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo img {
+      height: 50px;
+      width: auto;
+      display: inline-block;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.02);
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 18px;
+      background: #1b5e20;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .card h2 {
+      margin-bottom: 6px;
+      color: #2d3436;
+      font-weight: 600;
+      font-size: 24px;
+      letter-spacing: -0.3px;
+    }
+
+    .card .subtitle {
+      color: #636e72;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .amount-box {
+      padding: 20px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #1a5f2a, #2a8a3a);
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .amount-box small {
+      display: block;
+      opacity: .85;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .amount-box strong {
+      display: block;
+      font-size: 28px;
+      letter-spacing: -0.5px;
+    }
+
+    .receipt {
+      text-align: left;
+      border: 1px solid #edf2f7;
+      border-radius: 16px;
+      padding: 6px 18px;
+      margin-bottom: 22px;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f4f6;
+      font-size: 13.5px;
+    }
+
+    .receipt-row:last-child { border-bottom: 0; }
+    .receipt-row span:first-child { color: #636e72; }
+    .receipt-row strong { font-weight: 600; }
+
+    .btn {
+      width: 100%;
+      padding: 15px 20px;
+      background: #1a5f2a;
+      border: none;
+      border-radius: 14px;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+
+    .btn:hover { background: #134a20; }
+
+    .btn-light {
+      background: #ffffff;
+      color: #1a5f2a;
+      border: 1.5px solid #cfe3d5;
+      margin-top: 10px;
+    }
+
+    .btn-light:hover { background: #f3faf5; }
+
+    @media (max-width: 420px) {
+      .container { padding: 12px 4px; }
+      .card { padding: 26px 18px; border-radius: 20px; }
+      .amount-box strong { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo">
+      <img src="logo.png" alt="HarakaPay">
+    </div>
+
+    <div class="card">
+      <div class="success-icon">✓</div>
+      <h2>Mkopo Umepokelewa!</h2>
+      <p class="subtitle">
+        Mkopo wako wa Haraka Loan umetumwa kwenye pochi yako ya HarakaPay.
+        Lipa kwa wakati ili kupata mikopo mikubwa zaidi.
+      </p>
+
+      <div class="amount-box">
+        <small>Kiasi kilichopokelewa</small>
+        <strong id="receivedAmount">TZS 0</strong>
+      </div>
+
+      <div class="receipt">
+        <div class="receipt-row"><span>Namba ya kumbukumbu</span><strong id="refNo">—</strong></div>
+        <div class="receipt-row"><span>Mwombaji</span><strong id="applicantName">—</strong></div>
+        <div class="receipt-row"><span>Eneo</span><strong id="applicantRegion">—</strong></div>
+        <div class="receipt-row"><span>Akaunti ya HarakaPay</span><strong id="payEmail">—</strong></div>
+        <div class="receipt-row"><span>Tuzo ya kurejesha</span><strong id="totalRepay">—</strong></div>
+        <div class="receipt-row"><span>Tarehe ya kurejesha</span><strong id="dueDate">—</strong></div>
+      </div>
+
+      <a class="btn" href="index.html">Maliza</a>
+      <a class="btn btn-light" href="index.html">Rudi kwenye Haraka Loan</a>
+    </div>
+  </div>
+
+  <script>
+    const application = JSON.parse(localStorage.getItem('haraka_application') || 'null');
+    const email = localStorage.getItem('haraka_pay_email') || '—';
+
+    if (application) {
+      document.getElementById('receivedAmount').textContent =
+        'TZS ' + Number(application.amount).toLocaleString('en-US');
+      document.getElementById('refNo').textContent = application.reference || '—';
+      document.getElementById('applicantName').textContent = application.fullName || '—';
+      document.getElementById('applicantRegion').textContent = application.region || '—';
+      document.getElementById('totalRepay').textContent = application.total
+        ? 'TZS ' + Number(application.total).toLocaleString('en-US') : '—';
+      document.getElementById('dueDate').textContent = application.dueDate || '—';
+    }
+
+    document.getElementById('payEmail').textContent = email;
+  </script>
+</body>
+</html>
