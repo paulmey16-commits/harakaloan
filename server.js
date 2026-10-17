@@ -359,7 +359,24 @@ async function pollOnce() {
   }
 }
 
+/* log whether the bot can actually reach this chat, with the API's own error */
+function logTelegramHealth() {
+  tgCall('getMe').then((me) => {
+    if (!me.ok) {
+      console.error('[telegram] getMe failed →', me.error || me.description || JSON.stringify(me));
+      return;
+    }
+    console.log('[telegram] bot @' + me.result.username + ' OK (chat_id=' + CHAT_ID + ')');
+    return tgCall('sendMessage', { chat_id: CHAT_ID, text: '✅ Haraka Loan backend is live on ' + (process.env.RENDER_EXTERNAL_URL || 'local') });
+  }).then((sent) => {
+    if (sent && !sent.ok) {
+      console.error('[telegram] cannot message CHAT_ID=' + CHAT_ID + ' →', sent.error || sent.description || JSON.stringify(sent));
+    }
+  }).catch((e) => console.error('[telegram] health check error:', e.message));
+}
+
 function startPolling() {
+  logTelegramHealth();
   tgCall('deleteWebhook').catch(() => {});
   polling = setInterval(() => {
     pollOnce().catch((e) => console.error('[telegram poll]', e && e.message));
